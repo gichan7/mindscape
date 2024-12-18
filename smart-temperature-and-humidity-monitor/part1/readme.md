@@ -53,7 +53,7 @@
 
 이번 프로젝트에서는 Zero 2 W 모델을 사용합니다. 이 모델은 6.5cm x 3cm의 크기, 1GHZ quad-core 64-bit Arm 프로세서, 512MB SDRAM을 탑재했으며 Wi-Fi를 지원합니다. 작은 크기와 저렴한 가격이 특징입니다. 직접 지원하는 Raspberry Pi OS 를 비롯한 다양한 리눅스 배포판을 사용할 수 있습니다. 
 
-[https://lh7-rt.googleusercontent.com/docsz/AD_4nXfyHpIkXJ0if-OVmqOfcJelpzWzbrhKIgdOAeNpsGBtEexY69htOQN7plZdueLBZ-y-euE-THOKwFeiuRCHHIgCnI1j8uHVvObnR8fOfO0c_S8ktZKcPh9NqygOKvttppkQoeFvQw?key=SLMFdQr2JwT98xCRr8VO5N3b](https://lh7-rt.googleusercontent.com/docsz/AD_4nXfyHpIkXJ0if-OVmqOfcJelpzWzbrhKIgdOAeNpsGBtEexY69htOQN7plZdueLBZ-y-euE-THOKwFeiuRCHHIgCnI1j8uHVvObnR8fOfO0c_S8ktZKcPh9NqygOKvttppkQoeFvQw?key=SLMFdQr2JwT98xCRr8VO5N3b)
+![Raspberry Pi Zero 2 W](images/01-zero2w.png)
 
 이미지 설명: Raspberry Pi Zero 2 W
 
@@ -68,7 +68,7 @@
 - Digital 1-Wire 방식
 - 샘플링 주기: 2초
 
-[https://lh7-rt.googleusercontent.com/docsz/AD_4nXc0LIP-XDpoVo_fVv7W5OR2RCdBh00O2tkDCobV2U_IzeHQ1b_IHQV-Zq-Yff8ZuU2cQVFoIU2le_208ONiHU5FZYvX86_Bs58Xl_MMoXn_BzxHUpl3wXEzF8UbrwDLRhp43yi9?key=SLMFdQr2JwT98xCRr8VO5N3b](https://lh7-rt.googleusercontent.com/docsz/AD_4nXc0LIP-XDpoVo_fVv7W5OR2RCdBh00O2tkDCobV2U_IzeHQ1b_IHQV-Zq-Yff8ZuU2cQVFoIU2le_208ONiHU5FZYvX86_Bs58Xl_MMoXn_BzxHUpl3wXEzF8UbrwDLRhp43yi9?key=SLMFdQr2JwT98xCRr8VO5N3b)
+![DHT22](images/02-sensor.png)
 
 # 사용할 소프트웨어
 
