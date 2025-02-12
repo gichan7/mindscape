@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "smart-temperature-and-humidity-monitor/part3/readme.md",
                 "mode": "source",
-                "source": false
+                "source": true
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "readme"
             }
           }
         ]
@@ -40,7 +40,8 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical"
+                "sortOrder": "alphabetical",
+                "autoReveal": false
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -164,11 +165,24 @@
   },
   "active": "c9bbbca7874b6564",
   "lastOpenFiles": [
-    "2024-12-19.md",
+    "smart-temperature-and-humidity-monitor/part3/images/01-server.png~",
+    "smart-temperature-and-humidity-monitor/part2/readme.md",
+    "smart-temperature-and-humidity-monitor/part3/readme.md",
+    "smart-temperature-and-humidity-monitor/part3/images/04-metrix-chart.png",
+    "smart-temperature-and-humidity-monitor/part3/images/06-metrix-chart.png",
+    "smart-temperature-and-humidity-monitor/part3/images/05-metrix-chart.png",
+    "smart-temperature-and-humidity-monitor/part3/images/Screenshot 2025-02-11 at 9.53.19 AM.png",
+    "smart-temperature-and-humidity-monitor/part3/images/05-metrix-alert.png",
+    "smart-temperature-and-humidity-monitor/part3/images/Screenshot 2025-02-11 at 8.25.38 AM.png",
     "README.md",
-    "Untitled.canvas",
+    "smart-temperature-and-humidity-monitor/part3/images/04-mxql.png",
+    "smart-temperature-and-humidity-monitor/part3/images/03-metrix-data.png",
+    "smart-temperature-and-humidity-monitor/part3/images/02-metrix.png",
+    "smart-temperature-and-humidity-monitor/part3/images/01-server.png",
+    "smart-temperature-and-humidity-monitor/part3/images",
+    "smart-temperature-and-humidity-monitor/part3/untitled folder",
     "smart-temperature-and-humidity-monitor/part1/readme.md",
-    "smart-temperature-and-humidity-monitor/part1/images/02-sensor.png",
-    "smart-temperature-and-humidity-monitor/part1/images/01-zero2w.png"
+    "2024-12-19.md",
+    "Untitled.canvas"
   ]
 }

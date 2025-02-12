@@ -1,18 +1,30 @@
 # 나만의 스마트 온습도 모니터링 시스템 구축 프로젝트 (3/4)
 
-발행일: January 16, 2025
+발행일: 
 작성자: Gichan Nam
 카테고리: 와탭모니터링
 
 
 # **3부: 와탭 연동**
 
-와탭 Focus는 와탭 모니터링에서 제공하지 않는 임의의 데이터를 시계열로 업로드하는 프로그램입니다.
-소개 : https://docs.whatap.io/focus/introduction
-다양한 CPU 아키텍처를 지원하고 있으며, 라즈베리 2W 모델의 arm64 아키텍처를 지원합니다.
+와탭 Focus는 와탭 모니터링 플랫폼에서 커스텀 시계열 데이터를 업로드할 수 있는 프로그램입니다. 자세한 내용은 공식 문서(https://docs.whatap.io/focus/introduction)에서 확인할 수 있습니다. Focus는 다양한 CPU 아키텍처를 지원하며, 라즈베리 파이의 arm64 아키텍처도 지원합니다.
 
 
-## WhaTap Focus 설정
+# 와탭 프로젝트 준비 
+
+Focus를 사용하기 위해서는 와탭 계정과 프로젝트가 필요합니다. Focus는 사용자가 정의한 데이터를 메트릭스 형식으로 와탭 프로젝트에 전송할 수 있습니다. 메트릭스 데이터를 지원하는 모든 와탭 프로젝트에서 사용 가능합니다.
+
+와탭은 서버 모니터링 서비스를 5대까지 무료로 제공하고 있어, 유료 사용자가 아니더라도 서버 모니터링 프로젝트로 시작해볼 수 있습니다.
+
+
+
+![서버 프로젝트 관리 화면](images/01-server.png)
+
+프로젝트 생성 후, 관리 화면에서 프로젝트 액세스 키와 프로젝트 코드를 확인이 가능합니다. 이 두 가지 정보는 라즈베리 파이에서 수집한 데이터를 Focus가 와탭으로 전송하는 데 필요합니다. 와탭 서버 호스트 정보는 에이전트 설치 페이지에서 확인할 수 있습니다.
+
+# WhaTap Focus 설정
+
+와탭 에이전트 저장소 ( https://repo.whatap.io/index.html#focus/ ) 에서 Focus 에이전트를 다운로드 받습니다. Pi2w 는 linux_arm64 아키텍처로 동작하고 있습니다. 
 
 ```
 (pi) gcnam@pi2w:~$ wget https://repo.whatap.io/focus/linux_arm64/focus
@@ -29,6 +41,8 @@ focus                      100%[=====================================>]  33.46M 
 
 (pi) gcnam@pi2w:~$ chmod +x focus
 ```
+
+wget 명령어를 사용하여 라즈베리 파이 내부에 다운로드하고 실행 권한을 부여 합니다. 
 
 ```
 (pi) gcnam@pi2w:~$ ./focus
@@ -79,8 +93,23 @@ usage: focus   -pcode <pcode>    : project code
 (pi) gcnam@pi2w:~$
 ```
 
+Focus 에서 지원하는 명령어는 위와 같습니다.
+
+사용자 데이터를 전송하기 위해서는 license, pcode, category, onetime 옵션을 전달해야 합니다.
+
 ```
-(pi) gcnam@pi2w:~$ echo '{"temperature": 27.1, "humidity": 37.0}' | ./focus -license x479s23j7it9r-xd9j6pp9juk78-z4dan9rfga5htf     -pcode 7484 -server.host 13.124.11.223     -category sensor -onetime
+echo '{"temperature": 27.1, "humidity": 37.0}' |        // 사용자 JSON 데이터
+./focus 
+-license x479s23j7it9r-*************-z4dan9rfga5htf     // 프로젝트 라이센스
+-pcode 7*****                                           // 프로젝트 코드
+-server.host 13.124.*.*                                 // 와탭 서버 호스트
+-category sensor                                        // 카테고리
+-onetime                                                // JSON OneTime 전송
+```
+
+
+```
+(pi) gcnam@pi2w:~$ echo '{"temperature": 27.1, "humidity": 37.0}' | ./focus -license x479s23j7it9r-*************-z4dan9rfga5htf     -pcode 7***** -server.host 13.124.*.*     -category sensor -onetime
 
     ______                WHATAP
    / ____/___  _______  _______
@@ -92,145 +121,195 @@ usage: focus   -pcode <pcode>    : project code
  Copyright ⓒ 2019 WhaTap Labs Inc. All rights reserved.
 
  Collecting stdin-json
-2025/01/17 11:36:59 [TCP] Connected 13.124.11.223:6600
-2025/01/17 11:36:59 [TCP] Closed 13.124.11.223:6600
+2025/01/17 11:36:59 [TCP] Connected 13.124.*.*:6600
+2025/01/17 11:36:59 [TCP] Closed 13.124.*.*:6600
 ```
 
-사용자 데이터를 전송하기 위해서는 license, pcode, category, onetime 옵션을 전달해야 합니다. 
+가상의 데이터를 Focus를 통하여 전송해 봅니다. 
+
+# 메트릭스 기능 소개
+
+![메트릭스 기능 소개](images/02-metrix.png)
+메트릭스 조회 화면에 지정한 sensor 카테고리가 생성된 것을 확인할 수 있습니다. 
+
+![매트릭스 데이터 조회](images/03-metrix-data.png)
+해당 시간에 조회를 해보면 반복 전송한 원본 데이터가 조회 됩니다. 
+
+![차트 미리 보기](images/04-metrix-chart.png)
+MXQL 데이터 조회를 사용하면 시리즈 차트로 구성해서 미리 보기 할 수 있습니다. 
+
+![매트릭스 알림 설정](images/05-metrix-alert.png)
+와탭은 수집된 메트릭스 데이터에 대해 알람을 설정할 수 있습니다. 예를 들어 온도가 30도를 초과하면, 이메일, 모바일 앱 푸시, SMS, 또는 서드파티 플러그인을 통해 알림을 받을 수 있습니다.
+
+# 실제 데이터 수집 전송 
+
+라즈베리파이에 연결된 온습도 센서에서 수집한 데이터를 Focus 를 통하여 와탭으로 전송하는 코드를 작성합니다.
+## dht22-focus.py
 
 ```
-echo '{"temperature": 27.1, "humidity": 37.0}' |        // 사용자 JSON 데이터
-./focus 
--license x479s23j7it9r-xd9j6pp9juk78-z4dan9rfga5htf     // 프로젝트 라이센스
--pcode 7484                                             // 프로젝트 코드
--server.host 13.124.11.223                              // 와탭 서버 호스트
--category sensor                                        // 카테고리
--onetime                                                //  JSON OneTime 전송
+import adafruit_dht
+import board
+import time
+import json
+import os
+import sys
+import subprocess
+import logging
+from datetime import datetime
+
+# 로깅 설정
+def setup_logging():
+    log_dir = 'logs'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(
+                os.path.join(log_dir, f'sensor_{datetime.now().strftime("%Y%m%d")}.log')
+            ),
+            logging.StreamHandler(sys.stderr)
+        ]
+    )
+    return logging.getLogger(__name__)
+
+def read_dht22_sensor():
+    stderr = sys.stderr
+    sys.stderr = open(os.devnull, 'w')
+    sensor = adafruit_dht.DHT22(board.D4)
+    max_attempts = 10
+    attempts = 0
+
+    try:
+        while attempts < max_attempts:
+            try:
+                temperature = sensor.temperature
+                humidity = sensor.humidity
+
+                # 센서 데이터 유효성 검사
+                if not (isinstance(temperature, (int, float)) and isinstance(humidity, (int, float))):
+                    raise ValueError("Invalid sensor data types")
+                if not (-40 <= temperature <= 80 and 0 <= humidity <= 100):
+                    raise ValueError("Sensor values out of valid range")
+
+                return {
+                    "temperature": round(temperature, 1),
+                    "humidity": round(humidity, 1),
+                    "result": True
+                }
+            except Exception as e:
+                attempts += 1
+                if attempts < max_attempts:
+                    time.sleep(2)
+                continue
+
+        return {
+            "temperature": 0,
+            "humidity": 0,
+            "result": False
+        }
+    finally:
+        sys.stderr = stderr
+        try:
+            sensor.exit()
+        except:
+            pass
+
+def send_to_focus(data, logger):
+    try:
+        # result 키 제거 및 JSON 문자열 생성
+        send_data = {k: v for k, v in data.items() if k != 'result'}
+        json_str = json.dumps(send_data)
+
+        # focus 명령어 구성
+        focus_cmd = [
+            'echo',
+            json_str,
+            '|',
+            './focus',
+            '-license', 'x479s23j7it9r-*************-z4dan9rfga5htf',
+            '-pcode', '7*****',
+            '-server.host', '13.124.*.*',
+            '-category', 'sensor',
+            '-onetime'
+        ]
+
+        # 명령어 실행
+        cmd = ' '.join(focus_cmd)
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+
+        if result.returncode == 0:
+            logger.info(f"Data sent successfully: {json_str}")
+            return True
+        else:
+            logger.error(f"Focus command failed: {result.stderr}")
+            return False
+
+    except Exception as e:
+        logger.error(f"Error sending data: {str(e)}")
+        return False
+
+def main():
+    logger = setup_logging()
+    logger.info("Starting DHT22 sensor monitoring")
+
+    # 종료 핸들링을 위한 플래그
+    running = True
+
+    try:
+        while running:
+            try:
+                # 센서 데이터 읽기
+                sensor_data = read_dht22_sensor()
+
+                # 유효한 데이터인 경우에만 전송
+                if sensor_data["result"]:
+                    success = send_to_focus(sensor_data, logger)
+                    if not success:
+                        logger.warning("Failed to send data, will retry in next iteration")
+                else:
+                    logger.warning("Failed to read sensor data")
+
+                # 다음 읽기까지 대기
+                time.sleep(2)
+
+            except KeyboardInterrupt:
+                logger.info("Program terminated by user")
+                running = False
+            except Exception as e:
+                logger.error(f"Unexpected error in main loop: {str(e)}")
+                time.sleep(2)  # 오류 발생 시 잠시 대기 후 재시도
+
+    except Exception as e:
+        logger.critical(f"Critical error in main program: {str(e)}")
+    finally:
+        logger.info("Program terminated")
+
+if __name__ == "__main__":
+    main()
+
 ```
 
+## 코드 실행
 
+```
+(pi) gcnam@pi2w:~$ python3 dht22-focus.py
+2025-02-11 08:33:50,560 - INFO - Starting DHT22 sensor monitoring
+2025-02-11 08:33:58,128 - INFO - Data sent successfully: {"temperature": 20.5, "humidity": 24.5}
+2025-02-11 08:34:03,042 - INFO - Data sent successfully: {"temperature": 20.6, "humidity": 24.4}
+2025-02-11 08:34:10,311 - INFO - Data sent successfully: {"temperature": 20.6, "humidity": 24.4}
+2025-02-11 08:34:22,149 - INFO - Data sent successfully: {"temperature": 20.6, "humidity": 24.4}
+2025-02-11 08:34:45,028 - WARNING - Failed to read sensor data
+```
 
+라즈베리파이를 활용한 주기적 데이터 전송 시스템을 구현하였습니다. 이번에 작성한 글에서는 아날로그 센서(DHT22)를 사용하였는데,  아날로그 센서는 특성상 오류가 빈번하게 발생할 수 있어 오류 검출 로직을 추가하였습니다. 만약 비용제약이 없다면, I2C 통신이 가능한 디지털 센서를 활용하여 보다 안정적인 시스템을 구축할 수 있습니다.
 
-- WhaTap Focus 설정
-- 데이터 전송 구현
-- WhaTap 대시보드 및 알림 구성
+현재 공유된 코드는 기본적인 기능 구현에 초점을 맞춘 예제 코드입니다. 실제 서비스 단계에서는 시스템 안정화, 상태 모니터링, 환경 변수 분리 등 추가적인 보완이 필요합니다.
 
+코드는 https://github.com/gichan7/mindscape 저장소에서도 확인 할수 있습니다.
 
-이번 글에서는 라즈베리파이 하드웨어 설정하고 온습도 센서를 연결하여 기본적인 데이터 수집 환경을 구축하고자 합니다. 
+# 마무리
 
-# 프로젝트 소개
-
-스마트홈 시대가 본격적으로 도래하면서 온습도 모니터링 IoT 기기와 관련 서비스들이 넘쳐나고 있습니다. Tuya의 SmartLife, 국내 헤이홈, TP-Link의 Tapo, 삼성이 인수한 SmartThings 등 다양한 선택지가 존재합니다. 이러한 제품들은 Wi-Fi 연결과 모바일 앱 등록만으로도 손쉽게 사용할 수 있는 장점이 있지만, 개발자의 관점에서 보면 몇 가지 아쉬운 점도 있습니다. 
-
-**대부분의 서비스는 데이터를 1분 또는 1시간 단위로 수집하는데, 이러한 데이터 수집 주기는 세밀한 모니터링이 필요한 상황에서는 충분하지 않을 수 있습니다.** 
-
-이와 같은 문제를 해결하려는 목적에서 이번 프로젝트를 진행하게 되었습니다. 더 세밀한 데이터 수집과 실시간 알림을 통해 스마트홈 환경을 보다 효율적으로 관리하고자 하며, 이를 와탭을 활용하여 구현해보려고 합니다. 
-
-# 왜 와탭으로 구축해야 할까?
-
-와탭을 활용하면 다음과 같은 장점들이 있습니다. 
-
-- **5초 단위**까지 데이터 수집 주기 설정 가능
-- **직관적인 대시보드**를 통한 데이터 시각화
-- **Open API**를 통한 데이터 접근성 제공
-- **Grafana 연동**으로 커스텀 대시보드 구성 가능
-- **실시간 알림 설정** 기능 제공
-
-이러한 시스템은 단순한 취미 프로젝트를 넘어 스마트팜과 같은 실용적인 프로젝트로 확장할 수 있는 가능성도 제공합니다. 
-
-# 프로젝트 구현 과정
-
-이 시리즈에서는 총 세 가지 단계로 나누어 프로젝트를 진행할 예정입니다. 
-
-### **1. 하드웨어 구성**
-
-- 라즈베리파이 셋업
-- 온습도 센서 연결 및 테스트
-- 데이터 수집 환경 구축
-
-### **2. 와탭 연동**
-
-- 수집한 데이터 와탭으로 전송 구현
-- 대시보드 구성
-- 알림 설정
-
-### **3. 모바일 앱 개발**
-
-- 와탭 Open API 활용
-- 실시간 모니터링 앱 구현
-
-# 사용할 하드웨어
-
-### **라즈베리파이(**Raspberry Pi)
-
-라즈베리파이는 영국의 라즈베리 재단에서 개발한 교육용 미니 컴퓨터입니다. 2012년 1세대 Model B 출시 이후, 현재는 Raspberry Pi 5까지 출시했고, 최신 버전은 개인용 PC로도 사용 가능한 성능을 제공합니다. 작은 크기와 저전력 특성으로 산업용으로도 활용되고 있습니다. 
-
-이번 프로젝트에서는 Zero 2 W 모델을 사용합니다. 이 모델은 6.5cm x 3cm의 크기, 1GHZ quad-core 64-bit Arm 프로세서, 512MB SDRAM을 탑재했으며 Wi-Fi를 지원합니다. 작은 크기와 저렴한 가격이 특징입니다. 직접 지원하는 Raspberry Pi OS 를 비롯한 다양한 리눅스 배포판을 사용할 수 있습니다. 
-
-![Raspberry Pi Zero 2 W](images/01-zero2w.png)
-
-이미지 설명: Raspberry Pi Zero 2 W
-
-### 온습도 센서
-
-다양한 온습도 센서들이 있으며, DHT11, DHT22, SHT31, BME280 등이 국내에서 쉽게 구할 수 있습니다. 그 중에서 경제적이고 설치가 용이한 DHT22(AM2302)를 선택했습니다. 
-
-**DHT22(AM2302) 주요 스펙**
-
-- 온도 측정 범위: -40~80°C ( ±0.5°C )
-- 습도 측정 범위: 0-100% RH ( ±2-5% )
-- Digital 1-Wire 방식
-- 샘플링 주기: 2초
-
-![DHT22](images/02-sensor.png)
-
-# 사용할 소프트웨어
-
-### WhaTap Focus
-
-https://docs.whatap.io/focus/introduction
-
-WhaTap Focus는 외부 시계열 데이터를 와탭 서비스로 손쉽게 전송할 수 있는 기능을 제공합니다. 이 기능을 통해 에이전트가 기본적으로 수집하지 않는 사용자 데이터를 모니터링할 수 있습니다.
-
-### WhaTap Server
-
-https://docs.whatap.io/server/introduction
-
-WhaTap Server는 서버에 에이전트를 설치하여 기본적인 시스템 메트릭을 수집할 수 있으며, WhaTap Focus를 통해 추가 데이터 모니터링도 가능합니다.
-
-### WhaTap Open API
-
-https://docs.whatap.io/openapi-spec
-
-와탭에 저장된 데이터를 REST API를 통해 조회할 수 있습니다. 와탭의 쿼리 언어인 MXQL([https://docs.whatap.io/mxql/mxql-overview](https://docs.whatap.io/mxql/mxql-overview))을 지원하여 다양한 데이터도 쉽게 검색하고 활용할 수 있습니다.
-
-# 다음 글 예고
-
-이 시리즈에서는 와탭의 다양한 기능들을 활용하여 온습도 모니터링 시스템을 구축할 예정입니다. 라즈베리파이에서 수집한 센서 데이터는 WhaTap Focus를 통해 전송하고, WhaTap Server로 라즈베리파이의 상태를 감시하며, Open API를 통해 모바일 앱에서 데이터를 시각화할 것입니다. 
-
-# 시리즈 구성
-
-### **1부: 프로젝트 개요**
-
-- 프로젝트 소개
-- 사용할 하드웨어
-- 사용할 소프트웨어
-
-### **2부: 하드웨어 구성**
-
-- 라즈베리파이 (Zero 2 W) 설정
-- 온습도 센서 (DHT22) 연결
-- 데이터 수집 환경 구축
-
-### **3부: 와탭 연동 (현재)**
-
-- WhaTap Focus 설정
-- 데이터 전송 구현
-- WhaTap 대시보드 및 알림 구성
-
-### **4부: 모바일 앱 개발**
-
-- WhaTap Open API 연동
-- 실시간 모니터링 앱 구현
-
-이번 시리즈를 통해 IoT 디바이스부터 모니터링 시스템, 모바일 앱까지 통합된 스마트 모니터링 솔루션을 단계별로 구현해보겠습니다. 기대해주세요!
+라즈베리파이에서 수집 온습도 데이터를 와탭으로 전송하여 데이터를 저장하고 시각화하는 과정을 살펴 보았습니다. 4부 : 모바일 앱 개발 편에서는 와탭에 저장된 데이터를 Open API 를 통해 조회하고 간단한 모바일 앱을 통하여 실시간으로 보여주는 예제를 만들어 볼 예정입니다.
